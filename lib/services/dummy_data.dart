@@ -23,7 +23,7 @@ class DummyDataService {
       username: 'macdemarco',
       displayName: 'Mac Demarco',
       bio: 'Indie artist',
-      profileImageUrl: 'https://example.com/mac.jpg',
+      profileImageUrl: 'assets/images/macdemarco.png',
       postsCount: 210,
       followersCount: 12000,
       followingCount: 184,

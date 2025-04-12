@@ -73,38 +73,36 @@ class PostCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const Spacer(),
-                Text(
-                  timeAgo,
-                  style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Text(
+                    timeAgo,
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  ),
                 ),
-                const SizedBox(width: 4),
-                Icon(Icons.more_horiz, color: Colors.grey[600]),
+                const Spacer(),
+                Icon(Icons.person_add_alt_1_rounded, color: Colors.grey[600]),
               ],
             ),
           ),
-
           // Post image
-          AspectRatio(
-            aspectRatio: 3 / 2,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey[200],
-                    child: const Center(
-                      child: Icon(
-                        Icons.image_not_supported,
-                        size: 48,
-                        color: Colors.grey,
-                      ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: Image.asset(
+              imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey[200],
+                  child: const Center(
+                    child: Icon(
+                      Icons.image_not_supported,
+                      size: 48,
+                      color: Colors.grey,
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ),
 
@@ -132,7 +130,7 @@ class PostCard extends StatelessWidget {
 
           // Actions and likes count
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -141,12 +139,12 @@ class PostCard extends StatelessWidget {
                     Icon(
                       isLiked ? Icons.favorite : Icons.favorite_border,
                       color: isLiked ? Colors.red : Colors.black,
-                      size: 22,
+                      size: 20,
                     ),
                     const SizedBox(width: 16),
-                    const Icon(Icons.share_outlined, size: 22),
+                    const Icon(Icons.share, size: 20),
                     const Spacer(),
-                    const Icon(Icons.bookmark_border, size: 22),
+                    const Icon(Icons.bookmark_border, size: 20),
                   ],
                 ),
                 const SizedBox(height: 4),

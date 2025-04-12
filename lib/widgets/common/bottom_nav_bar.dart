@@ -33,8 +33,8 @@ class BottomNavBar extends StatelessWidget {
             _buildNavItem(1, Icons.search_outlined, Icons.search, size: 24),
             _buildNavItem(
               2,
-              Icons.add_circle,
-              Icons.add_circle,
+              Icons.add_circle_rounded,
+              Icons.add_circle_rounded,
               size: 48,
               alwaysUseActiveColor: true,
             ),
