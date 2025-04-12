@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // Brand colors
-  static const Color primaryColor = Color(0xFF8D7B68);
-  static const Color secondaryColor = Color(0xFFF8EDE3);
-  static const Color accentColor = Color(0xFFD0B8A8);
-  static const Color backgroundColor = Color(0xFFE6DFD3);
+  static const Color primaryColor = Color(0xFF826555); // Warm brown
+  static const Color secondaryColor = Color(0xFFF3EEE5); // Light beige
+  static const Color accentColor = Color(0xFFD9CBB0); // Medium beige
+  static const Color backgroundColor = Color(0xFFF7F5F1); // Off-white
   // Text colors
-  static const Color textPrimaryColor = Color(0xFF3C2A21);
-  static const Color textSecondaryColor = Color(0xFF7D6E83);
+  static const Color textPrimaryColor = Color(0xFF5C4B3B); // Dark brown
+  static const Color textSecondaryColor = Color(0xFF8B7967); // Medium brown
 
   // Light theme
   static ThemeData lightTheme = ThemeData(
@@ -21,7 +21,7 @@ class AppTheme {
     ),
     scaffoldBackgroundColor: backgroundColor,
     appBarTheme: const AppBarTheme(
-      backgroundColor: secondaryColor,
+      backgroundColor: Colors.white,
       elevation: 0,
       foregroundColor: textPrimaryColor,
     ),

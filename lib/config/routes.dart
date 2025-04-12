@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/feed/feed_screen.dart';
 
 class AppRoutes {
   // Route names
@@ -10,7 +11,7 @@ class AppRoutes {
   // We'll define the actual routes later when we have screens implemented
   static Map<String, WidgetBuilder> getRoutes() {
     return {
-      home: (context) => const Placeholder(),
+      home: (context) => const FeedScreen(),
       profile: (context) => const Placeholder(),
       search: (context) => const Placeholder(),
       studio: (context) => const Placeholder(),
