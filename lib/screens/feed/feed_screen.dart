@@ -5,6 +5,10 @@ import '../../widgets/feed/post_card.dart';
 import '../../widgets/feed/create_post_card.dart';
 import '../../widgets/common/bottom_nav_bar.dart';
 
+/// The main feed screen of the application
+///
+/// Displays a chronological feed of posts from other users
+/// Has two tabs: "For You" (personalized content) and "Following" (content from followed users)
 class FeedScreen extends StatefulWidget {
   const FeedScreen({super.key});
   @override
@@ -12,16 +16,24 @@ class FeedScreen extends StatefulWidget {
 }
 
 class _FeedScreenState extends State<FeedScreen> {
+  /// Index of the currently selected tab (0: "For You", 1: "Following")
   int _selectedTabIndex = 0;
+
+  /// Current navigation index (0 represents the Feed tab in the bottom nav bar)
   int _currentNavIndex = 0;
 
+  /// Handles navigation when a bottom navigation tab is tapped
   void _onNavTap(int index) {
-    setState(() {
-      _currentNavIndex = index;
-    });
-    // In a real app, we would navigate to different screens
-    // For now, just showing a message
-    if (index != 0) {
+    if (index == _currentNavIndex) return;
+
+    if (index == 0) {
+      // Already on Feed Screen
+      return;
+    } else if (index == 1) {
+      // Navigate to Search Screen
+      Navigator.pushReplacementNamed(context, '/search');
+    } else {
+      // Other screens not implemented yet
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Navigation to tab $index not implemented yet')),
       );
@@ -55,7 +67,7 @@ class _FeedScreenState extends State<FeedScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Animated Custom Tab Bar
+            // Custom tab bar with animation for switching between "For You" and "Following"
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Container(
@@ -67,7 +79,7 @@ class _FeedScreenState extends State<FeedScreen> {
                 ),
                 child: Stack(
                   children: [
-                    // Animated Selection Indicator
+                    // Animated indicator that slides to show the selected tab
                     AnimatedPositioned(
                       duration: const Duration(milliseconds: 250),
                       curve: Curves.easeInOut,
@@ -83,9 +95,10 @@ class _FeedScreenState extends State<FeedScreen> {
                         ),
                       ),
                     ),
-                    // Tab Options
+                    // Tab buttons row
                     Row(
                       children: [
+                        // "For You" tab
                         Expanded(
                           child: InkWell(
                             onTap: () => setState(() => _selectedTabIndex = 0),
@@ -105,6 +118,7 @@ class _FeedScreenState extends State<FeedScreen> {
                             ),
                           ),
                         ),
+                        // "Following" tab
                         Expanded(
                           child: InkWell(
                             onTap: () => setState(() => _selectedTabIndex = 1),
@@ -131,17 +145,17 @@ class _FeedScreenState extends State<FeedScreen> {
               ),
             ),
 
-            // Create post card and content
+            // Main feed content area
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Create post card
+                  // Create post card (allows users to create new posts)
                   CreatePostCard(user: DummyDataService.getCurrentUser()),
                   const SizedBox(height: 16),
 
-                  // Feed content based on selected tab
+                  // Display content based on selected tab
                   _selectedTabIndex == 0
                       ? _buildForYouContent()
                       : _buildFollowingContent(),
@@ -158,6 +172,10 @@ class _FeedScreenState extends State<FeedScreen> {
     );
   }
 
+  /// Builds the content for the "For You" tab
+  ///
+  /// Displays a personalized feed of posts from various users
+  /// Currently uses dummy data for demonstration purposes
   Widget _buildForYouContent() {
     return Column(
       children: [
@@ -182,6 +200,10 @@ class _FeedScreenState extends State<FeedScreen> {
     );
   }
 
+  /// Builds the content for the "Following" tab
+  ///
+  /// Displays posts only from users that the current user follows
+  /// Shows an empty state message if the user isn't following anyone
   Widget _buildFollowingContent() {
     final user = DummyDataService.getCurrentUser();
 
