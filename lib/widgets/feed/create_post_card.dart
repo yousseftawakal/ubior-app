@@ -12,14 +12,14 @@ class CreatePostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 200,
+      margin: const EdgeInsets.symmetric(vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(5),
-            blurRadius: 4,
+            color: Color.fromRGBO(0, 0, 0, 0.05),
+            blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
@@ -31,23 +31,30 @@ class CreatePostCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                // User avatar
                 CircleAvatar(
                   radius: 24,
+                  backgroundColor: AppTheme.secondaryColor,
                   backgroundImage:
                       user.profileImageUrl != null
-                          ? NetworkImage(user.profileImageUrl!)
+                          ? AssetImage(user.profileImageUrl!)
                           : null,
                   child:
                       user.profileImageUrl == null
                           ? Text(
                             user.displayName[0],
-                            style: const TextStyle(fontSize: 20),
+                            style: const TextStyle(
+                              fontSize: 20,
+                              color: AppTheme.primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                           )
                           : null,
                 ),
                 const SizedBox(width: 12),
+                // Text prompt
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,7 +63,7 @@ class CreatePostCard extends StatelessWidget {
                         'Share your style',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          fontSize: 16,
+                          fontSize: 13,
                           color: AppTheme.textPrimaryColor,
                         ),
                       ),
@@ -64,8 +71,8 @@ class CreatePostCard extends StatelessWidget {
                       Text(
                         'What are you wearing today?',
                         style: TextStyle(
-                          color: Colors.brown[300],
-                          fontSize: 14,
+                          color: AppTheme.textSecondaryColor,
+                          fontSize: 13,
                         ),
                       ),
                     ],
@@ -76,41 +83,36 @@ class CreatePostCard extends StatelessWidget {
           ),
 
           // Divider
-          Divider(height: 1, thickness: 1, color: Color(0xFFE6DFD3)),
+          Divider(height: 1, thickness: 1, color: AppTheme.dividerColor),
 
-          // Bottom section with buttons and vertical divider - simplified approach
-          Expanded(
+          // Bottom section with buttons
+          Container(
+            height: 84,
+            padding: const EdgeInsets.symmetric(vertical: 12),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 // Left button (Attach)
-                Expanded(
-                  child: Center(
-                    child: _buildCircularButton(
-                      context,
-                      label: 'Attach',
-                      icon: FontAwesomeIcons.paperclip,
-                      onTap: () {},
-                    ),
-                  ),
+                _buildActionButton(
+                  context,
+                  label: 'Attach',
+                  icon: FontAwesomeIcons.paperclip,
+                  onTap: () {
+                    // Handle attach action
+                  },
                 ),
 
                 // Vertical divider
-                Container(
-                  height: double.infinity,
-                  width: 1,
-                  color: Color(0xFFE6DFD3),
-                ),
+                Container(height: 90, width: 1, color: AppTheme.dividerColor),
 
                 // Right button (Studio)
-                Expanded(
-                  child: Center(
-                    child: _buildCircularButton(
-                      context,
-                      icon: Icons.table_chart_rounded,
-                      label: 'Studio',
-                      onTap: () {},
-                    ),
-                  ),
+                _buildActionButton(
+                  context,
+                  icon: Icons.table_chart_rounded,
+                  label: 'Studio',
+                  onTap: () {
+                    // Handle studio action
+                  },
                 ),
               ],
             ),
@@ -120,34 +122,33 @@ class CreatePostCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCircularButton(
+  Widget _buildActionButton(
     BuildContext context, {
     required IconData icon,
     required String label,
     required VoidCallback onTap,
   }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(30),
-          child: Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              shape: BoxShape.circle,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: AppTheme.primaryColor, size: 20),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: TextStyle(
+                color: AppTheme.textPrimaryColor,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-            child: Icon(icon, color: Colors.brown[400], size: 24),
-          ),
+          ],
         ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(color: AppTheme.textPrimaryColor, fontSize: 14),
-        ),
-      ],
+      ),
     );
   }
 }
