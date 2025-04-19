@@ -2,20 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:ubior/config/theme.dart';
 import 'package:ubior/config/routes.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key});
+class Signuplast extends StatefulWidget {
+  const Signuplast({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  State<Signuplast> createState() => _SignuplastState();
 }
 
-class _LoginState extends State<Login> {
+class _SignuplastState extends State<Signuplast> {
   // Controllers for the form fields
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  // Current step in the signup process (0-based)
+  final int _currentStep = 1; // Last step
+
+  // Total number of steps
+  final int _totalSteps = 2;
 
   // State variable to track password visibility
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   // Toggle password visibility
   void _togglePasswordVisibility() {
@@ -24,18 +33,64 @@ class _LoginState extends State<Login> {
     });
   }
 
+  // Toggle confirm password visibility
+  void _toggleConfirmPasswordVisibility() {
+    setState(() {
+      _obscureConfirmPassword = !_obscureConfirmPassword;
+    });
+  }
+
   @override
   void dispose() {
     // Clean up the controllers when the widget is disposed
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(toolbarHeight: 70, scrolledUnderElevation: 0),
+      appBar: AppBar(
+        // Back button
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: AppTheme.textPrimaryColor),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        // Step indicator in the center - fixed centering
+        titleSpacing: 0,
+        title: Center(
+          child: SizedBox(
+            width: 140, // Fixed width container for better centering
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(_totalSteps, (index) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: 60,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color:
+                        index <= _currentStep
+                            ? AppTheme.primaryColor
+                            : AppTheme.secondaryColor,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                );
+              }),
+            ),
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          // Add invisible action to balance the back button
+          SizedBox(width: 48),
+        ],
+        scrolledUnderElevation: 0,
+      ),
       // Use SingleChildScrollView to handle keyboard overflow
       body: SingleChildScrollView(
         child: SafeArea(
@@ -56,7 +111,7 @@ class _LoginState extends State<Login> {
                       ),
                       SizedBox(height: 36),
                       Text(
-                        "Welcome to UBIÓR",
+                        "Create your account",
                         style: TextStyle(
                           color: AppTheme.textPrimaryColor,
                           fontFamily: "Italiana",
@@ -64,7 +119,7 @@ class _LoginState extends State<Login> {
                         ),
                       ),
                       Text(
-                        "Sign in to continue your fashion journey",
+                        "Just a few more details to get started",
                         style: TextStyle(
                           color: AppTheme.textSecondaryColor,
                           fontSize: 16,
@@ -80,7 +135,7 @@ class _LoginState extends State<Login> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Email",
+                        "Username",
                         style: TextStyle(
                           color: AppTheme.textPrimaryColor,
                           fontSize: 14,
@@ -89,53 +144,31 @@ class _LoginState extends State<Login> {
                       ),
                       const SizedBox(height: 8),
                       TextFormField(
-                        controller: _emailController,
+                        controller: _usernameController,
                         decoration: InputDecoration(
-                          hintText: "your-email@example.com",
+                          hintText: "Your Name",
                           hintStyle: TextStyle(
                             color: AppTheme.textHintColor,
                             fontSize: 12,
                           ),
                         ),
-                        keyboardType: TextInputType.emailAddress,
+                        keyboardType: TextInputType.text,
                         maxLines: 1,
                       ),
                       const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Password",
-                            style: TextStyle(
-                              color: AppTheme.textPrimaryColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              // Handle forgot password
-                            },
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              minimumSize: Size(0, 0),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                            child: Text(
-                              "Forgot Password?",
-                              style: TextStyle(
-                                color: AppTheme.primaryColor,
-                                fontSize: 10,
-                              ),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        "Password",
+                        style: TextStyle(
+                          color: AppTheme.textPrimaryColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _passwordController,
                         decoration: InputDecoration(
-                          hintText: "Enter your password",
+                          hintText: "Create a strong password",
                           hintStyle: TextStyle(
                             color: AppTheme.textHintColor,
                             fontSize: 12,
@@ -155,18 +188,82 @@ class _LoginState extends State<Login> {
                         maxLines: 1,
                       ),
                       const SizedBox(height: 20),
+                      Text(
+                        "Confirm Password",
+                        style: TextStyle(
+                          color: AppTheme.textPrimaryColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _confirmPasswordController,
+                        decoration: InputDecoration(
+                          hintText: "Confirm your password",
+                          hintStyle: TextStyle(
+                            color: AppTheme.textHintColor,
+                            fontSize: 12,
+                          ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              size: 16,
+                              _obscureConfirmPassword
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              color: AppTheme.textHintColor,
+                            ),
+                            onPressed: _toggleConfirmPasswordVisibility,
+                          ),
+                        ),
+                        obscureText: _obscureConfirmPassword,
+                        maxLines: 1,
+                      ),
+                      const SizedBox(height: 20),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
                             // Get values from controllers
-                            final email = _emailController.text;
+                            final username = _usernameController.text;
                             final password = _passwordController.text;
+                            final confirmPassword =
+                                _confirmPasswordController.text;
 
-                            // TODO: Implement login logic
-                            print('Login with: $email / $password');
+                            // Validate inputs
+                            if (username.isEmpty ||
+                                password.isEmpty ||
+                                confirmPassword.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Please fill in all fields"),
+                                ),
+                              );
+                              return;
+                            }
 
-                            // Navigate to home screen on successful login
+                            // Validate password match
+                            if (password != confirmPassword) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Passwords don't match"),
+                                ),
+                              );
+                              return;
+                            }
+
+                            // TODO: Save user data and authenticate
+
+                            // Print for debugging
+                            print(
+                              '$username account created with password: $password',
+                            );
+
+                            // After successful signup, navigate to onboarding
+                            // When you create your onboarding screen, uncomment this:
+                            // Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
+
+                            // For now, navigate to the home screen
                             Navigator.pushReplacementNamed(
                               context,
                               AppRoutes.home,
@@ -179,44 +276,13 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                           child: Text(
-                            "Sign In",
+                            "Create account",
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Don't have an account? ",
-                            style: TextStyle(
-                              color: AppTheme.textSecondaryColor,
-                              fontSize: 14,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              // Navigate to signup screen
-                              Navigator.pushNamed(context, AppRoutes.signup);
-                            },
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              minimumSize: Size(0, 0),
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            ),
-                            child: Text(
-                              "Sign up",
-                              style: TextStyle(
-                                color: AppTheme.primaryColor,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        ],
                       ),
                     ],
                   ),
@@ -233,7 +299,7 @@ class _LoginState extends State<Login> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "By signing in, you agree to our ",
+              "By signing up, you agree to our ",
               style: TextStyle(
                 color: AppTheme.textSecondaryColor,
                 fontSize: 12,

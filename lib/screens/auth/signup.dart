@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ubior/config/theme.dart';
+import 'package:ubior/config/routes.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -13,6 +14,12 @@ class _SignupState extends State<Signup> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _displaynameController = TextEditingController();
 
+  // Current step in the signup process (0-based)
+  final int _currentStep = 0; // First step
+
+  // Total number of steps
+  final int _totalSteps = 2;
+
   @override
   void dispose() {
     // Clean up the controllers when the widget is disposed
@@ -24,7 +31,46 @@ class _SignupState extends State<Signup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        toolbarHeight: 70,
+        // Back button
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: AppTheme.textPrimaryColor),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        // Step indicator in the center - fixed centering
+        titleSpacing: 0,
+        title: Center(
+          child: Container(
+            width: 140, // Fixed width container for better centering
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(_totalSteps, (index) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: 60,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color:
+                        index <= _currentStep
+                            ? AppTheme.primaryColor
+                            : AppTheme.secondaryColor,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                );
+              }),
+            ),
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          // Add invisible action to balance the back button
+          SizedBox(width: 48),
+        ],
+        scrolledUnderElevation: 0,
+      ),
       // Use SingleChildScrollView to handle keyboard overflow
       body: SingleChildScrollView(
         child: SafeArea(
@@ -120,8 +166,21 @@ class _SignupState extends State<Signup> {
                             final email = _emailController.text;
                             final displayname = _displaynameController.text;
 
-                            // TODO: Implement login logic
-                            print('Login with: $email / $displayname');
+                            // Validate inputs
+                            if (email.isEmpty || displayname.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Please fill in all fields"),
+                                ),
+                              );
+                              return;
+                            }
+
+                            // Store the values to pass to the next screen
+                            print('Email: $email, Display Name: $displayname');
+
+                            // Navigate to the next step
+                            Navigator.pushNamed(context, AppRoutes.signupLast);
                           },
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(vertical: 5),
@@ -151,7 +210,11 @@ class _SignupState extends State<Signup> {
                           ),
                           TextButton(
                             onPressed: () {
-                              // Handle sign up
+                              // Navigate back to login screen
+                              Navigator.pushReplacementNamed(
+                                context,
+                                AppRoutes.login,
+                              );
                             },
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,
@@ -183,7 +246,7 @@ class _SignupState extends State<Signup> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "By signing in, you agree to our ",
+              "By signing up, you agree to our ",
               style: TextStyle(
                 color: AppTheme.textSecondaryColor,
                 fontSize: 12,

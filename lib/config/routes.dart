@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import '../screens/feed/feed_screen.dart';
 import '../screens/search/search_screen.dart';
+import '../screens/auth/login.dart';
+import '../screens/auth/signup.dart';
+import '../screens/auth/signuplast.dart';
+import '../screens/profile/profile.dart';
 
 /// Centralized route configuration for the application
 ///
@@ -21,15 +25,32 @@ class AppRoutes {
   /// Studio/wardrobe management screen route
   static const String studio = '/studio';
 
+  /// Login screen route
+  static const String login = '/login';
+
+  /// Signup first step screen route
+  static const String signup = '/signup';
+
+  /// Signup last step screen route
+  static const String signupLast = '/signup/last';
+
+  /// Onboarding screen route - shown after signup
+  static const String onboarding = '/onboarding';
+
   /// Returns a map of route names to their builder functions
   ///
   /// Used by MaterialApp to define the available routes
   static Map<String, WidgetBuilder> getRoutes() {
     return {
       home: (context) => const FeedScreen(),
-      profile: (context) => const Placeholder(), // Not implemented yet
+      profile: (context) => const Profile(),
       search: (context) => const SearchScreen(),
       studio: (context) => const Placeholder(), // Not implemented yet
+      login: (context) => const Login(),
+      signup: (context) => const Signup(),
+      signupLast: (context) => const Signuplast(),
+      // Onboarding screens will be added when you create them
+      // onboarding: (context) => const OnboardingScreen(),
     };
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
+import '../../config/routes.dart'; // Import routes
 import '../../widgets/common/bottom_nav_bar.dart';
 import '../../services/search_service.dart';
 import '../../models/user.dart';
@@ -33,7 +34,7 @@ class _SearchScreenState extends State<SearchScreen> {
   ];
 
   // Current navigation index (1 represents the Search tab)
-  int _currentNavIndex = 1;
+  final int _currentNavIndex = 1;
 
   // Flag to track if a search is currently active
   bool _isSearching = false;
@@ -50,17 +51,36 @@ class _SearchScreenState extends State<SearchScreen> {
     // Avoid unnecessary navigation if already on the selected tab
     if (index == _currentNavIndex) return;
 
-    if (index == 0) {
-      // Navigate to Feed Screen (index 0)
-      Navigator.pushReplacementNamed(context, '/feed');
-    } else if (index == 1) {
-      // Already on Search Screen (index 1)
-      return;
-    } else {
-      // Other screens not implemented yet, show a message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Navigation to tab $index not implemented yet')),
-      );
+    switch (index) {
+      case 0:
+        // Navigate to Feed Screen (index 0)
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+        break;
+      case 1:
+        // Already on Search Screen (index 1)
+        return;
+      case 2:
+        // Handle create post - modal or navigate to create screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Create post feature coming soon')),
+        );
+        break;
+      case 3:
+        // Handle create post - modal or navigate to create screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Create post feature coming soon')),
+        );
+      case 4:
+        // Navigate to Profile screen
+        Navigator.pushReplacementNamed(context, AppRoutes.profile);
+        break;
+      default:
+        // Other screens not implemented yet, show a message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Navigation to tab $index not implemented yet'),
+          ),
+        );
     }
   }
 
@@ -111,14 +131,14 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: 122,
-        backgroundColor: Colors.white,
         // Search bar embedded in the app bar
         title: Padding(
-          padding: const EdgeInsets.only(top: 66,bottom: 20.0),
+          padding: const EdgeInsets.only(top: 66, bottom: 20.0),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: Color(0xFFF1EDE7),
               borderRadius: BorderRadius.circular(12),
             ),
             child: TextField(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
+import '../../config/routes.dart'; // Import routes
 import '../../services/dummy_data.dart';
 import '../../widgets/feed/post_card.dart';
 import '../../widgets/feed/create_post_card.dart';
@@ -26,17 +27,36 @@ class _FeedScreenState extends State<FeedScreen> {
   void _onNavTap(int index) {
     if (index == _currentNavIndex) return;
 
-    if (index == 0) {
-      // Already on Feed Screen
-      return;
-    } else if (index == 1) {
-      // Navigate to Search Screen
-      Navigator.pushReplacementNamed(context, '/search');
-    } else {
-      // Other screens not implemented yet
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Navigation to tab $index not implemented yet')),
-      );
+    switch (index) {
+      case 0:
+        // Already on Feed Screen
+        return;
+      case 1:
+        // Navigate to Search Screen
+        Navigator.pushReplacementNamed(context, AppRoutes.search);
+        break;
+      case 2:
+        // Handle create post - modal or navigate to create screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Create post feature coming soon')),
+        );
+        break;
+      case 3:
+        // Handle create post - modal or navigate to create screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Create post feature coming soon')),
+        );
+      case 4:
+        // Navigate to Profile screen
+        Navigator.pushReplacementNamed(context, AppRoutes.profile);
+        break;
+      default:
+        // Other screens not implemented yet
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Navigation to tab $index not implemented yet'),
+          ),
+        );
     }
   }
 
@@ -46,6 +66,7 @@ class _FeedScreenState extends State<FeedScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: 122,
         title: Padding(
           padding: const EdgeInsets.only(top: 64.0, left: 24, bottom: 20),
@@ -61,7 +82,6 @@ class _FeedScreenState extends State<FeedScreen> {
           ),
         ],
         elevation: 0,
-        backgroundColor: Colors.white,
         scrolledUnderElevation: 0,
       ),
       body: SingleChildScrollView(
@@ -182,10 +202,10 @@ class _FeedScreenState extends State<FeedScreen> {
         ...DummyDataService.users
             .where((u) => u.id != DummyDataService.getCurrentUser().id)
             .map(
-              (poster) => Column(
+              (u) => Column(
                 children: [
                   PostCard(
-                    user: poster,
+                    user: u,
                     timeAgo: '. 2 HOURS AGO',
                     imageUrl: 'assets/images/macdemarco.png',
                     tags: const ['Evening', 'Elegant', 'Date Night'],
