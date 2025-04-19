@@ -8,18 +8,18 @@ class DummyDataService {
   // Mock users
   static final List<User> users = [
     User(
-      id: '1',
+      id: '0',
       username: 'iloveradiohead',
       displayName: 'Thom Yorke',
       bio: 'It wears mewo',
-      profileImageUrl: 'https://example.com/thom.jpg',
+      profileImageUrl: 'assets/images/thomyorke.png',
       coverImageUrl: 'https://example.com/cover.jpg',
       postsCount: 420,
       followersCount: 8500,
       followingCount: 36,
     ),
     User(
-      id: '2',
+      id: '1',
       username: 'macdemarco',
       displayName: 'Mac Demarco',
       bio: 'Indie artist',
@@ -130,7 +130,7 @@ class DummyDataService {
 
   // Get current user (simulate logged in user)
   static User getCurrentUser() {
-    return users.first;
+    return users[0];
   }
 
   // Get user by ID

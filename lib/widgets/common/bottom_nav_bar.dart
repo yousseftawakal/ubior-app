@@ -44,7 +44,7 @@ class BottomNavBar extends StatelessWidget {
             _buildNavItem(
               context,
               0,
-              Icons.home_outlined,
+              Icons.home,
               Icons.home,
               AppRoutes.home,
               size: 24,

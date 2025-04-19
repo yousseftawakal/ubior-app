@@ -46,7 +46,7 @@ class PostCard extends StatelessWidget {
                   radius: 18,
                   backgroundImage:
                       user.profileImageUrl != null
-                          ? NetworkImage(user.profileImageUrl!)
+                          ? AssetImage(user.profileImageUrl!)
                           : null,
                   child:
                       user.profileImageUrl == null
