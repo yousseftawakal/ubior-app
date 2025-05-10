@@ -3,6 +3,7 @@ import 'package:ubior/config/theme.dart';
 import '../../models/user.dart';
 import '../../widgets/common/bottom_nav_bar.dart';
 import '../../config/routes.dart';
+import 'settings_screen.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -24,6 +25,8 @@ class _ProfileState extends State<Profile> {
     followersCount: 8500,
     followingCount: 36,
   );
+
+  final int _currentNavIndex = 4; // Index for Profile in bottom nav bar
 
   @override
   Widget build(BuildContext context) {
@@ -47,17 +50,17 @@ class _ProfileState extends State<Profile> {
           ),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: IconButton(
-              icon: Icon(
-                Icons.settings_outlined,
-                color: AppTheme.textPrimaryColor,
-              ),
-              onPressed: () {
-                // Handle settings
-              },
+          IconButton(
+            icon: Icon(
+              Icons.settings_outlined,
+              color: AppTheme.textPrimaryColor,
             ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
           ),
         ],
         scrolledUnderElevation: 0,
@@ -135,7 +138,10 @@ class _ProfileState extends State<Profile> {
                           decoration: BoxDecoration(
                             color: AppTheme.backgroundColor,
                             shape: BoxShape.circle,
-                            border: Border.all(color: AppTheme.dividerColor,width: 2),
+                            border: Border.all(
+                              color: AppTheme.dividerColor,
+                              width: 2,
+                            ),
                           ),
                           child: IconButton(
                             icon: Icon(
@@ -162,42 +168,65 @@ class _ProfileState extends State<Profile> {
             SizedBox(height: 45),
 
             // User info
-            Text(
-              _user.displayName,
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: AppTheme.textPrimaryColor,
+            Center(
+              child: Text(
+                _user.displayName,
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textPrimaryColor,
+                ),
               ),
             ),
             SizedBox(height: 3),
-            Text(
-              '@${_user.username}',
-              style: TextStyle(
-                fontSize: 16,
-                color: AppTheme.textSecondaryColor,
+            Center(
+              child: Text(
+                '@${_user.username}',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: AppTheme.textSecondaryColor,
+                ),
               ),
             ),
             SizedBox(height: 16),
-            Text(
-              _user.bio ?? '',
-              style: TextStyle(fontSize: 16, color: AppTheme.textPrimaryColor),
+            Center(
+              child: Text(
+                _user.bio ?? '',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: AppTheme.textPrimaryColor,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
 
             // Stats row
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0,horizontal: 24),
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildStat(_user.postsCount.toString(), 'Posts'),
-                  SizedBox(width: 29,height:37,),
-                  _buildStat(
-                    '${(_user.followersCount / 1000).toStringAsFixed(1)}k',
-                    'Followers',
+                  Expanded(
+                    child: Center(
+                      child: _buildStat(_user.postsCount.toString(), 'Posts'),
+                    ),
                   ),
-                  SizedBox(width: 24),
-                  _buildStat(_user.followingCount.toString(), 'Following'),
+                  Expanded(
+                    child: Center(
+                      child: _buildStat(
+                        '${(_user.followersCount / 1000).toStringAsFixed(1)}k',
+                        'Followers',
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: _buildStat(
+                        _user.followingCount.toString(),
+                        'Following',
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -208,9 +237,7 @@ class _ProfileState extends State<Profile> {
               child: Column(
                 children: [
                   TabBar(
-                    labelStyle: TextStyle(
-                      fontSize: 16,
-                    ),
+                    labelStyle: TextStyle(fontSize: 16),
                     dividerColor: AppTheme.dividerColor,
                     labelColor: AppTheme.primaryColor,
                     unselectedLabelColor: AppTheme.textSecondaryColor,
@@ -249,9 +276,9 @@ class _ProfileState extends State<Profile> {
         ),
       ),
       bottomNavigationBar: BottomNavBar(
-        currentIndex: 4,
+        currentIndex: _currentNavIndex,
         onTap: (index) {
-          if (index == 4) return; // Already on profile
+          if (index == _currentNavIndex) return;
 
           switch (index) {
             case 0:
@@ -260,7 +287,12 @@ class _ProfileState extends State<Profile> {
             case 1:
               Navigator.pushReplacementNamed(context, AppRoutes.search);
               break;
-            // Other tabs
+            case 2:
+              Navigator.pushReplacementNamed(context, AppRoutes.createPost);
+              break;
+            case 3:
+              Navigator.pushReplacementNamed(context, AppRoutes.studio);
+              break;
           }
         },
       ),
