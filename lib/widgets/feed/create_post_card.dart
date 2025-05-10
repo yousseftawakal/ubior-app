@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ubior/config/routes.dart';
 import '../../models/user.dart';
 import '../../config/theme.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -98,7 +99,10 @@ class CreatePostCard extends StatelessWidget {
                   label: 'Attach',
                   icon: FontAwesomeIcons.paperclip,
                   onTap: () {
-                    // Handle attach action
+                    Navigator.pushReplacementNamed(
+                      context,
+                      AppRoutes.createPost,
+                    );
                   },
                 ),
 
@@ -111,7 +115,10 @@ class CreatePostCard extends StatelessWidget {
                   icon: Icons.table_chart_rounded,
                   label: 'Studio',
                   onTap: () {
-                    // Handle studio action
+                    Navigator.pushReplacementNamed(
+                      context,
+                      AppRoutes.createPost,
+                    );
                   },
                 ),
               ],
