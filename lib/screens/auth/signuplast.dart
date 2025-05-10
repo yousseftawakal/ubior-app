@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ubior/config/theme.dart';
 import 'package:ubior/config/routes.dart';
+import 'package:ubior/widgets/common/step_progress_indicator.dart';
 
 class Signuplast extends StatefulWidget {
   const Signuplast({super.key});
@@ -63,25 +64,12 @@ class _SignuplastState extends State<Signuplast> {
         // Step indicator in the center - fixed centering
         titleSpacing: 0,
         title: Center(
-          child: SizedBox(
-            width: 140, // Fixed width container for better centering
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_totalSteps, (index) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: 60,
-                  height: 12,
-                  decoration: BoxDecoration(
-                    color:
-                        index <= _currentStep
-                            ? AppTheme.primaryColor
-                            : AppTheme.secondaryColor,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                );
-              }),
-            ),
+          child: StepProgressIndicator(
+            currentStep: _currentStep,
+            totalSteps: _totalSteps,
+            containerWidth: 140,
+            stepHeight: 12,
+            borderRadius: 6,
           ),
         ),
         centerTitle: true,
@@ -259,14 +247,10 @@ class _SignuplastState extends State<Signuplast> {
                               '$username account created with password: $password',
                             );
 
-                            // After successful signup, navigate to onboarding
-                            // When you create your onboarding screen, uncomment this:
-                            // Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
-
-                            // For now, navigate to the home screen
+                            // After successful signup, navigate to success screen
                             Navigator.pushReplacementNamed(
                               context,
-                              AppRoutes.home,
+                              AppRoutes.signupPhoto,
                             );
                           },
                           style: ElevatedButton.styleFrom(

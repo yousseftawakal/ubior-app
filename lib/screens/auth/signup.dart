@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ubior/config/theme.dart';
 import 'package:ubior/config/routes.dart';
+import 'package:ubior/widgets/common/step_progress_indicator.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -37,31 +38,16 @@ class _SignupState extends State<Signup> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: AppTheme.textPrimaryColor),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushReplacementNamed(context, AppRoutes.home);
           },
         ),
         // Step indicator in the center - fixed centering
         titleSpacing: 0,
         title: Center(
-          child: Container(
-            width: 140, // Fixed width container for better centering
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_totalSteps, (index) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: 60,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color:
-                        index <= _currentStep
-                            ? AppTheme.primaryColor
-                            : AppTheme.secondaryColor,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                );
-              }),
-            ),
+          child: StepProgressIndicator(
+            currentStep: _currentStep,
+            totalSteps: _totalSteps,
+            containerWidth: 140,
           ),
         ),
         centerTitle: true,
