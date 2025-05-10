@@ -6,6 +6,7 @@ import '../../models/wardrobe_item.dart';
 import '../../models/outfit.dart';
 import '../../models/closet.dart';
 import '../../services/dummy_data.dart';
+import '../../widgets/common/custom_alert_dialog.dart';
 
 class StudioScreen extends StatefulWidget {
   const StudioScreen({super.key});
@@ -728,36 +729,32 @@ class _StudioScreenState extends State<StudioScreen>
   void _showAddItemDialog() {
     final currentTab = _tabController.index;
     String title = 'Add Item'; // Default initialization
+    IconData dialogIcon;
 
     switch (currentTab) {
       case 0:
         title = 'Add Wardrobe Item';
+        dialogIcon = Icons.add_circle_outline;
         break;
       case 1:
         title = 'Create Outfit';
+        dialogIcon = Icons.style_outlined;
         break;
       case 2:
         title = 'Create Closet';
+        dialogIcon = Icons.folder_outlined;
         break;
+      default:
+        dialogIcon = Icons.add_circle_outline;
     }
 
-    showDialog(
+    CustomAlertDialog.show(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(title),
-            content: Text(
-              'This feature will be implemented in a future update.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          ),
+      title: title,
+      message: 'This feature will be implemented in a future update.',
+      primaryButtonText: 'OK',
+      icon: dialogIcon,
+      iconColor: AppTheme.primaryColor,
     );
   }
 

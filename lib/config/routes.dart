@@ -15,6 +15,7 @@ import '../screens/onboarding/onboarding1.dart';
 import '../screens/onboarding/onboarding2.dart';
 import '../screens/onboarding/onboarding3.dart';
 import '../screens/onboarding/onboarding4.dart';
+import '../screens/splash/splash_screen.dart';
 
 /// Centralized route configuration for the application
 ///
@@ -22,6 +23,9 @@ import '../screens/onboarding/onboarding4.dart';
 /// and provides a method to get the route builder map used by MaterialApp.
 class AppRoutes {
   // Route names - use these constants throughout the app to avoid typos
+
+  /// Splash screen route - initial route when app starts
+  static const String splash = '/';
 
   /// Home/Feed screen route - the main landing screen
   static const String home = '/home';
@@ -70,6 +74,7 @@ class AppRoutes {
   /// Used by MaterialApp to define the available routes
   static Map<String, WidgetBuilder> getRoutes() {
     return {
+      splash: (context) => const SplashScreen(),
       login: (context) => const Login(),
       signup: (context) => const Signup(),
       signupLast: (context) => const Signuplast(),

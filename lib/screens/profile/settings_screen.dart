@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:ubior/config/routes.dart';
 import 'package:ubior/config/theme.dart';
+import 'package:ubior/cubits/profile/profile_cubit.dart';
+import 'package:ubior/cubits/profile/profile_state.dart';
+import 'package:ubior/cubits/auth/auth_cubit.dart';
+import 'package:ubior/cubits/auth/auth_state.dart';
 import 'package:ubior/models/user.dart';
 import 'package:ubior/widgets/common/bottom_nav_bar.dart';
+import 'package:ubior/widgets/common/custom_alert_dialog.dart';
+import 'package:ubior/widgets/common/custom_snackbar.dart';
+import 'package:ubior/widgets/settings/danger_zone_section.dart';
+import 'package:ubior/widgets/settings/password_section.dart';
+import 'package:ubior/widgets/settings/privacy_section.dart';
+import 'package:ubior/widgets/settings/profile_info_section.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -17,30 +28,112 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
-  String? _selectedCountry = "United Kingdom";
+  String? _selectedCountry;
   bool _privateAccount = false;
 
-  // Mock user data (same as profile)
-  final User _user = User(
-    id: 'user123',
-    username: 'iloverediohead',
-    displayName: 'Thom Yorke',
-    bio: 'It wears mewo',
-    profileImageUrl: 'assets/images/thomyorke.png',
-    coverImageUrl: 'assets/images/profile_background.jpg',
-    postsCount: 420,
-    followersCount: 8500,
-    followingCount: 36,
-    email: 'thomyorke@example.com',
-  );
+  // Track if form is dirty (has changes)
+  bool _formDirty = false;
 
   @override
   void initState() {
     super.initState();
-    _nameController.text = _user.displayName;
-    _usernameController.text = _user.username;
-    _emailController.text = _user.email ?? '';
-    _bioController.text = _user.bio ?? '';
+    // Explicitly fetch user profile data when the screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      print('SettingsScreen: Initializing and fetching user profile');
+      context.read<ProfileCubit>().fetchUserProfile();
+    });
+  }
+
+  // Populate form fields with user data
+  void _populateFormFields(User user) {
+    _nameController.text = user.displayName;
+    _usernameController.text = user.username;
+    _emailController.text = user.email ?? '';
+    _bioController.text = user.bio ?? '';
+
+    // Set country if available in user data
+    final userData = user.toJson();
+    if (userData.containsKey('country') && userData['country'] != null) {
+      _selectedCountry = userData['country'];
+    }
+
+    // Set privacy setting
+    _privateAccount = user.isPrivate ?? false;
+
+    // Mark form as clean after populating
+    _formDirty = false;
+  }
+
+  // Save just profile information changes
+  void _saveProfileInfo() {
+    print('SettingsScreen: Saving profile information changes');
+
+    final profileCubit = context.read<ProfileCubit>();
+
+    // Update only profile information fields
+    profileCubit.updateUserProfile(
+      displayName: _nameController.text,
+      username: _usernameController.text,
+      email: _emailController.text,
+      bio: _bioController.text,
+      country: _selectedCountry,
+    );
+  }
+
+  // Save just privacy settings
+  void _savePrivacySettings(bool isPrivate) {
+    print('SettingsScreen: Saving privacy settings');
+
+    final profileCubit = context.read<ProfileCubit>();
+
+    // Update only privacy settings
+    profileCubit.updateUserProfile(isPrivate: isPrivate);
+  }
+
+  // Save password changes
+  void _savePassword() {
+    print('SettingsScreen: Saving password changes');
+
+    // This would call a different API endpoint for password changes
+    // For now, just show a success message
+    CustomSnackbar.show(
+      context: context,
+      message: 'Password changed successfully',
+      type: SnackBarType.success,
+    );
+  }
+
+  // Handle logout
+  void _handleLogout() {
+    print('SettingsScreen: Handling logout');
+
+    // Navigate to login screen
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      AppRoutes.login,
+      (route) => false,
+    );
+  }
+
+  // Handle delete account
+  void _handleDeleteAccount() {
+    print('SettingsScreen: Handling delete account');
+
+    // Show loading indicator
+    CustomSnackbar.showLoading(
+      context: context,
+      message: 'Deleting account...',
+    );
+
+    // Use AuthCubit to delete the account and handle navigation in the BlocListener
+    context.read<AuthCubit>().deleteAccount();
+  }
+
+  // Mark form as dirty when any field changes
+  void _markFormDirty() {
+    setState(() {
+      _formDirty = true;
+    });
   }
 
   @override
@@ -54,748 +147,220 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back),
-        ),
-        automaticallyImplyLeading: false,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        toolbarHeight: 90,
-        title: Text(
-          'Account Settings',
-          style: TextStyle(
-            color: AppTheme.textPrimaryColor,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profile Information Card
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: AppTheme.dividerColor.withAlpha(128)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header with icon
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.person_outline,
-                            color: AppTheme.primaryColor,
-                            size: 24,
-                          ),
-                          SizedBox(width: 9),
-                          Text(
-                            'Profile Information',
-                            style: TextStyle(
-                              color: AppTheme.textPrimaryColor,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Update your personal information and public profile',
-                        style: TextStyle(
-                          color: AppTheme.textSecondaryColor,
-                          fontSize: 14,
-                        ),
-                      ),
-                      SizedBox(height: 16),
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, authState) {
+        print('SettingsScreen: Auth state changed to ${authState.status}');
 
-                      // Display Name
-                      Text(
-                        'Display Name',
-                        style: TextStyle(
-                          color: AppTheme.textPrimaryColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        controller: _nameController,
-                        style: TextStyle(fontSize: 12),
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: AppTheme.dividerColor,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: AppTheme.dividerColor,
-                            ),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 10,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
+        // Only handle non-loading states for delete account process
+        if (!authState.isLoading) {
+          // Check for errors during deletion
+          if (authState.status == AuthStatus.unauthenticated &&
+              authState.errorMessage != null) {
+            // Clear loading snackbar
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-                      // Username
-                      Text(
-                        'Username',
-                        style: TextStyle(
-                          color: AppTheme.textPrimaryColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        controller: _usernameController,
-                        style: TextStyle(fontSize: 12),
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(
-                            Icons.alternate_email,
-                            color: AppTheme.textSecondaryColor,
-                            size: 24,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: AppTheme.dividerColor,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: AppTheme.dividerColor,
-                            ),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 4,
-                            vertical: 10,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-
-                      // Email
-                      Text(
-                        'Email',
-                        style: TextStyle(
-                          color: AppTheme.textPrimaryColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        controller: _emailController,
-                        style: TextStyle(fontSize: 12),
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(
-                            Icons.email_outlined,
-                            color: AppTheme.textSecondaryColor,
-                            size: 24,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: AppTheme.dividerColor,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: AppTheme.dividerColor,
-                            ),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 4,
-                            vertical: 10,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-
-                      // Bio
-                      Text(
-                        'Bio',
-                        style: TextStyle(
-                          color: AppTheme.textPrimaryColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        controller: _bioController,
-                        style: TextStyle(fontSize: 12),
-                        maxLength: 100,
-                        maxLines: 5,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: AppTheme.dividerColor,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: AppTheme.dividerColor,
-                            ),
-                          ),
-                          contentPadding: EdgeInsets.all(12),
-                          counterText: '',
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 12),
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            '${_bioController.text.length}/100 characters',
-                            style: TextStyle(
-                              color: AppTheme.textSecondaryColor,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-                      // Country
-                      Text(
-                        'Country',
-                        style: TextStyle(
-                          color: AppTheme.textPrimaryColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: DropdownButtonFormField<String>(
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Color(0xff000000),
-                          ),
-                          value: _selectedCountry,
-                          icon: Icon(
-                            Icons.keyboard_arrow_down,
-                            color: AppTheme.primaryColor,
-                          ),
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(
-                              Icons.location_on_outlined,
-                              color: AppTheme.textSecondaryColor,
-                              size: 18,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(
-                              horizontal: 12,
-                            ),
-                          ),
-
-                          items:
-                              [
-                                'United Kingdom',
-                                'United States',
-                                'Canada',
-                                'Australia',
-                                'Germany',
-                                'France',
-                              ].map((String country) {
-                                return DropdownMenuItem<String>(
-                                  value: country,
-                                  child: Text(country),
-                                );
-                              }).toList(),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              _selectedCountry = newValue;
-                            });
-                          },
-                        ),
-                      ),
-                      SizedBox(height: 16),
-
-                      // Save button
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Save profile information
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Profile updated successfully'),
-                              ),
-                            );
-                          },
-                          icon: Icon(
-                            Icons.save_outlined,
-                            size: 18,
-                            color: Colors.white,
-                          ),
-                          label: Text('Save Changes'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.primaryColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // Privacy Settings Card
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: AppTheme.dividerColor.withAlpha(128)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header with icon
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.shield_outlined,
-                            color: AppTheme.primaryColor,
-                            size: 20,
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            'Profile Privacy',
-                            style: TextStyle(
-                              color: AppTheme.textPrimaryColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        'Control who can see your profile and content',
-                        style: TextStyle(
-                          color: AppTheme.textSecondaryColor,
-                          fontSize: 14,
-                        ),
-                      ),
-                      SizedBox(height: 16),
-
-                      // Private Account Toggle
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Private Account',
-                            style: TextStyle(
-                              color: AppTheme.textPrimaryColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Switch(
-                            value: _privateAccount,
-                            onChanged: (value) {
-                              setState(() {
-                                _privateAccount = value;
-                              });
-                            },
-                            activeColor: AppTheme.primaryColor,
-                          ),
-                        ],
-                      ),
-
-                      // Description of private account
-                      Text(
-                        'When your account is private, only people you approve can see your photos and videos.',
-                        style: TextStyle(
-                          color: AppTheme.textSecondaryColor,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // Password Card
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: AppTheme.dividerColor.withAlpha(128)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header with icon
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.lock_outline,
-                            color: AppTheme.primaryColor,
-                            size: 24,
-                          ),
-                          SizedBox(width: 9),
-                          Text(
-                            'Password',
-                            style: TextStyle(
-                              color: AppTheme.textPrimaryColor,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Update your password to keep your account secure',
-                        style: TextStyle(
-                          color: AppTheme.textSecondaryColor,
-                          fontSize: 14,
-                        ),
-                      ),
-                      SizedBox(height: 16),
-
-                      // Current Password
-                      Text(
-                        'Current Password',
-                        style: TextStyle(
-                          color: AppTheme.textPrimaryColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        style: TextStyle(fontSize: 12),
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: AppTheme.dividerColor,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: AppTheme.dividerColor,
-                            ),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 10,
-                          ),
-                          suffixIcon: Icon(
-                            Icons.visibility_outlined,
-                            color: AppTheme.textSecondaryColor,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-
-                      // New Password
-                      Text(
-                        'New Password',
-                        style: TextStyle(
-                          color: AppTheme.textPrimaryColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        style: TextStyle(fontSize: 12),
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: AppTheme.dividerColor,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: AppTheme.dividerColor,
-                            ),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 10,
-                          ),
-                          suffixIcon: Icon(
-                            Icons.visibility_outlined,
-                            color: AppTheme.textSecondaryColor,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-
-                      // Confirm New Password
-                      Text(
-                        'Confirm New Password',
-                        style: TextStyle(
-                          color: AppTheme.textPrimaryColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      TextFormField(
-                        style: TextStyle(fontSize: 12),
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: AppTheme.dividerColor,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(
-                              color: AppTheme.dividerColor,
-                            ),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 10,
-                          ),
-                          suffixIcon: Icon(
-                            Icons.visibility_outlined,
-                            color: AppTheme.textSecondaryColor,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 16),
-
-                      // Change Password button
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Change password action
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Password changed successfully'),
-                              ),
-                            );
-                          },
-                          icon: Icon(
-                            Icons.lock_outline,
-                            size: 18,
-                            color: Colors.white,
-                          ),
-                          label: Text('Change Password'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.primaryColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            // Danger Zone Card
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: BorderSide(color: AppTheme.dividerColor.withAlpha(128)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Header
-                      Text(
-                        'Danger Zone',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Permanent actions that affect your account',
-                        style: TextStyle(
-                          color: AppTheme.textSecondaryColor,
-                          fontSize: 14,
-                        ),
-                      ),
-                      SizedBox(height: 16),
-
-                      // Delete Account
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Delete Account',
-                                  style: TextStyle(
-                                    color: AppTheme.textPrimaryColor,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  'Permanently delete your account and all of your content',
-                                  style: TextStyle(
-                                    color: AppTheme.textSecondaryColor,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          OutlinedButton(
-                            onPressed: () {
-                              // Delete account action with confirmation dialog
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text("Delete Account"),
-                                    content: Text(
-                                      "Are you sure you want to delete your account? This action cannot be undone.",
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: Text("Cancel"),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          // Delete account logic
-                                          Navigator.of(context).pop();
-                                          Navigator.pushReplacementNamed(
-                                            context,
-                                            AppRoutes.login,
-                                          );
-                                        },
-                                        child: Text(
-                                          "Delete",
-                                          style: TextStyle(color: Colors.red),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.red,
-                              side: BorderSide(color: Colors.red),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Text("Delete Account"),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            SizedBox(height: 40),
-          ],
-        ),
-      ),
-      bottomNavigationBar: BottomNavBar(
-        currentIndex: 4, // Profile tab
-        onTap: (index) {
-          if (index == 4) {
-            // Already on profile tab, just go back to profile
-            Navigator.pop(context);
-          } else {
-            // Navigate to other tabs
-            switch (index) {
-              case 0:
-                Navigator.pushReplacementNamed(context, AppRoutes.home);
-                break;
-              case 1:
-                Navigator.pushReplacementNamed(context, AppRoutes.search);
-                break;
-              case 2:
-                Navigator.pushReplacementNamed(context, AppRoutes.createPost);
-                break;
-              case 3:
-                Navigator.pushReplacementNamed(context, AppRoutes.studio);
-                break;
-            }
+            // Show error message
+            CustomSnackbar.show(
+              context: context,
+              message: 'Error: ${authState.errorMessage}',
+              type: SnackBarType.error,
+              duration: Duration(seconds: 5),
+            );
           }
+
+          // If user is now unauthenticated (after successful deletion)
+          if (authState.status == AuthStatus.unauthenticated &&
+              authState.errorMessage == null) {
+            // Clear loading snackbar
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+            // Show success message
+            CustomSnackbar.show(
+              context: context,
+              message: 'Account deleted successfully',
+              type: SnackBarType.success,
+            );
+
+            // Navigate to login screen
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              AppRoutes.login,
+              (route) => false,
+            );
+          }
+        }
+      },
+      child: BlocConsumer<ProfileCubit, ProfileState>(
+        listener: (context, state) {
+          print('SettingsScreen: Profile state changed to ${state.status}');
+
+          // When profile is loaded, update form fields
+          if (state.status == ProfileStatus.loaded && state.user != null) {
+            print(
+              'SettingsScreen: Populating form fields with user data: ${state.user!.displayName}',
+            );
+            _populateFormFields(state.user!);
+          }
+
+          // Show error if update fails
+          if (state.status == ProfileStatus.error) {
+            print('SettingsScreen: Error - ${state.errorMessage}');
+            CustomSnackbar.show(
+              context: context,
+              message: 'Error: ${state.errorMessage}',
+              type: SnackBarType.error,
+            );
+          }
+
+          // Show success message if profile was updated successfully
+          if (state.status == ProfileStatus.loaded && _formDirty == false) {
+            CustomSnackbar.show(
+              context: context,
+              message: 'Profile updated successfully',
+              type: SnackBarType.success,
+            );
+          }
+        },
+        builder: (context, state) {
+          // Show loading indicator while fetching or updating profile data
+          if (state.isLoading) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text('Account Settings'),
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          // If no user data is available, show error
+          if (state.user == null) {
+            return Scaffold(
+              appBar: AppBar(
+                title: Text('Account Settings'),
+                leading: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Failed to load user data'),
+                    SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed:
+                          () => context.read<ProfileCubit>().refreshProfile(),
+                      child: Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
+          // If we get this far, we have user data - build the settings UI
+          return Scaffold(
+            backgroundColor: AppTheme.backgroundColor,
+            appBar: AppBar(
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.arrow_back),
+              ),
+              automaticallyImplyLeading: false,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              toolbarHeight: 90,
+              title: Text(
+                'Account Settings',
+                style: TextStyle(
+                  color: AppTheme.textPrimaryColor,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              actions: [],
+            ),
+            body: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Profile Information Section
+                  ProfileInfoSection(
+                    nameController: _nameController,
+                    usernameController: _usernameController,
+                    emailController: _emailController,
+                    bioController: _bioController,
+                    selectedCountry: _selectedCountry,
+                    onCountryChanged: (value) {
+                      setState(() {
+                        _selectedCountry = value;
+                        _formDirty = true;
+                      });
+                    },
+                    onSave: _saveProfileInfo,
+                    onFieldChanged: (_) => _markFormDirty(),
+                  ),
+
+                  // Privacy Settings Section
+                  PrivacySection(
+                    privateAccount: _privateAccount,
+                    onPrivacyChanged: (value) {
+                      setState(() {
+                        _privateAccount = value;
+                      });
+                      _savePrivacySettings(value);
+                    },
+                  ),
+
+                  // Password Section
+                  PasswordSection(onSave: _savePassword),
+
+                  // Danger Zone Section
+                  DangerZoneSection(
+                    onLogout: _handleLogout,
+                    onDeleteAccount: _handleDeleteAccount,
+                  ),
+
+                  SizedBox(height: 40),
+                ],
+              ),
+            ),
+            bottomNavigationBar: BottomNavBar(
+              currentIndex: 4, // Profile tab
+              onTap: (index) {
+                if (index == 4) {
+                  // Already on profile tab, just go back to profile
+                  Navigator.pop(context);
+                } else {
+                  // Navigate to other tabs
+                  switch (index) {
+                    case 0:
+                      Navigator.pushReplacementNamed(context, AppRoutes.home);
+                      break;
+                    case 1:
+                      Navigator.pushReplacementNamed(context, AppRoutes.search);
+                      break;
+                    case 2:
+                      Navigator.pushReplacementNamed(
+                        context,
+                        AppRoutes.createPost,
+                      );
+                      break;
+                    case 3:
+                      Navigator.pushReplacementNamed(context, AppRoutes.studio);
+                      break;
+                  }
+                }
+              },
+            ),
+          );
         },
       ),
     );
