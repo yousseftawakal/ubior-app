@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
-import '../screens/feed/feed_screen.dart';
-import '../screens/search/search_screen.dart';
 import '../screens/auth/login.dart';
 import '../screens/auth/signup.dart';
 import '../screens/auth/signuplast.dart';
+import '../screens/feed/feed_screen.dart';
+import '../screens/search/search_screen.dart';
+import '../screens/create_post/create_post_screen.dart';
+import '../screens/studio/studio_screen.dart';
 import '../screens/profile/profile.dart';
+import '../screens/onboarding/onboarding1.dart';
+import '../screens/onboarding/onboarding2.dart';
+import '../screens/onboarding/onboarding3.dart';
+import '../screens/onboarding/onboarding4.dart';
 
 /// Centralized route configuration for the application
 ///
@@ -14,7 +20,7 @@ class AppRoutes {
   // Route names - use these constants throughout the app to avoid typos
 
   /// Home/Feed screen route - the main landing screen
-  static const String home = '/';
+  static const String home = '/home';
 
   /// User profile screen route
   static const String profile = '/profile';
@@ -32,25 +38,34 @@ class AppRoutes {
   static const String signup = '/signup';
 
   /// Signup last step screen route
-  static const String signupLast = '/signup/last';
+  static const String signupLast = '/signup-last';
 
-  /// Onboarding screen route - shown after signup
-  static const String onboarding = '/onboarding';
+  /// Create post screen route
+  static const String createPost = '/create-post';
+
+  /// Onboarding screen routes
+  static const String onboarding1 = '/onboarding1';
+  static const String onboarding2 = '/onboarding2';
+  static const String onboarding3 = '/onboarding3';
+  static const String onboarding4 = '/onboarding4';
 
   /// Returns a map of route names to their builder functions
   ///
   /// Used by MaterialApp to define the available routes
   static Map<String, WidgetBuilder> getRoutes() {
     return {
-      home: (context) => const FeedScreen(),
-      profile: (context) => const Profile(),
-      search: (context) => const SearchScreen(),
-      studio: (context) => const Placeholder(), // Not implemented yet
       login: (context) => const Login(),
       signup: (context) => const Signup(),
       signupLast: (context) => const Signuplast(),
-      // Onboarding screens will be added when you create them
-      // onboarding: (context) => const OnboardingScreen(),
+      home: (context) => const FeedScreen(),
+      search: (context) => const SearchScreen(),
+      createPost: (context) => const CreatePostScreen(),
+      studio: (context) => const StudioScreen(),
+      profile: (context) => const Profile(),
+      onboarding1: (context) => const Onboarding1(),
+      onboarding2: (context) => const Onboarding2(),
+      onboarding3: (context) => const Onboarding3(),
+      onboarding4: (context) => const Onboarding4(),
     };
   }
 }
