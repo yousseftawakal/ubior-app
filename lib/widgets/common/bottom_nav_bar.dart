@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
 import '../../config/routes.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 /// Bottom navigation bar component used throughout the app
 /// Provides consistent navigation between main app sections:
@@ -59,15 +60,7 @@ class BottomNavBar extends StatelessWidget {
               size: 24,
             ),
             // Create/Add tab (center, larger button)
-            _buildNavItem(
-              context,
-              2,
-              Icons.add_circle_rounded,
-              Icons.add_circle_rounded,
-              '',
-              size: 48,
-              alwaysUseActiveColor: true,
-            ),
+            _buildCenterButton(context),
             // Studio/Wardrobe tab
             _buildNavItem(
               context,
@@ -135,6 +128,25 @@ class BottomNavBar extends StatelessWidget {
                       .primaryColor // Active/selected color
                   : const Color(0xFFC2AD98), // Inactive color
         ),
+      ),
+    );
+  }
+
+  /// Builds the special center button with Font Awesome icon
+  Widget _buildCenterButton(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        // Special case for add button - doesn't navigate, just triggers callback
+        onTap(2);
+      },
+      child: Container(
+        height: 53,
+        width: 53,
+        decoration: BoxDecoration(
+          color: Color(0xFF8C6E54), // Brown color matching the image
+          shape: BoxShape.circle,
+        ),
+        child: Center(child: Icon(Icons.add, size: 28, color: Colors.white)),
       ),
     );
   }

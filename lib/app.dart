@@ -18,7 +18,7 @@ class App extends StatelessWidget {
       title: 'Ubior', // App title displayed in task switchers
       theme: AppTheme.lightTheme, // Apply our custom theme
       routes: AppRoutes.getRoutes(), // Set up navigation routes
-      initialRoute: AppRoutes.login, // Start with the login screen
+      initialRoute: AppRoutes.onboarding1, // Start with the login screen
     );
   }
 }

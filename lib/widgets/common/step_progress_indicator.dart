@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ubior/config/theme.dart';
 
 /// A horizontal step progress indicator widget.
 ///

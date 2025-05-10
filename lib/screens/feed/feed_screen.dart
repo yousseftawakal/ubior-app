@@ -21,44 +21,8 @@ class _FeedScreenState extends State<FeedScreen> {
   int _selectedTabIndex = 0;
 
   /// Current navigation index (0 represents the Feed tab in the bottom nav bar)
-  int _currentNavIndex = 0;
+  final int _currentNavIndex = 0;
 
-  /// Handles navigation when a bottom navigation tab is tapped
-  void _onNavTap(int index) {
-    if (index == _currentNavIndex) return;
-
-    switch (index) {
-      case 0:
-        // Already on Feed Screen
-        return;
-      case 1:
-        // Navigate to Search Screen
-        Navigator.pushReplacementNamed(context, AppRoutes.search);
-        break;
-      case 2:
-        // Handle create post - modal or navigate to create screen
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Create post feature coming soon')),
-        );
-        break;
-      case 3:
-        // Handle create post - modal or navigate to create screen
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Create post feature coming soon')),
-        );
-      case 4:
-        // Navigate to Profile screen
-        Navigator.pushReplacementNamed(context, AppRoutes.profile);
-        break;
-      default:
-        // Other screens not implemented yet
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Navigation to tab $index not implemented yet'),
-          ),
-        );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +151,24 @@ class _FeedScreenState extends State<FeedScreen> {
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: _currentNavIndex,
-        onTap: _onNavTap,
+        onTap: (index) {
+          if (index == _currentNavIndex) return;
+
+          switch (index) {
+            case 1:
+              Navigator.pushReplacementNamed(context, AppRoutes.search);
+              break;
+            case 2:
+              Navigator.pushReplacementNamed(context, AppRoutes.createPost);
+              break;
+            case 3:
+              Navigator.pushReplacementNamed(context, AppRoutes.studio);
+              break;
+            case 4:
+              Navigator.pushReplacementNamed(context, AppRoutes.profile);
+              break;
+          }
+        },
       ),
     );
   }

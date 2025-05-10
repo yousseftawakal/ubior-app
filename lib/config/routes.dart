@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import '../screens/auth/login.dart';
 import '../screens/auth/signup.dart';
 import '../screens/auth/signuplast.dart';
+import '../screens/auth/signup_photo.dart';
+import '../screens/auth/signup_bio.dart';
+import '../screens/auth/signup_location.dart';
 import '../screens/feed/feed_screen.dart';
 import '../screens/search/search_screen.dart';
 import '../screens/create_post/create_post_screen.dart';
 import '../screens/studio/studio_screen.dart';
 import '../screens/profile/profile.dart';
+import '../screens/profile/settings_screen.dart';
 import '../screens/onboarding/onboarding1.dart';
 import '../screens/onboarding/onboarding2.dart';
 import '../screens/onboarding/onboarding3.dart';
@@ -40,6 +44,15 @@ class AppRoutes {
   /// Signup last step screen route
   static const String signupLast = '/signup-last';
 
+  /// Signup photo screen route
+  static const String signupPhoto = '/signup/photo';
+
+  /// Signup bio screen route
+  static const String signupBio = '/signup/bio';
+
+  /// Signup location screen route
+  static const String signupLocation = '/signup/location';
+
   /// Create post screen route
   static const String createPost = '/create-post';
 
@@ -49,6 +62,9 @@ class AppRoutes {
   static const String onboarding3 = '/onboarding3';
   static const String onboarding4 = '/onboarding4';
 
+  /// Settings screen route
+  static const String settings = '/settings';
+
   /// Returns a map of route names to their builder functions
   ///
   /// Used by MaterialApp to define the available routes
@@ -57,6 +73,9 @@ class AppRoutes {
       login: (context) => const Login(),
       signup: (context) => const Signup(),
       signupLast: (context) => const Signuplast(),
+      signupPhoto: (context) => const SignupPhoto(),
+      signupBio: (context) => const SignupBio(),
+      signupLocation: (context) => const SignupLocation(),
       home: (context) => const FeedScreen(),
       search: (context) => const SearchScreen(),
       createPost: (context) => const CreatePostScreen(),
@@ -66,6 +85,7 @@ class AppRoutes {
       onboarding2: (context) => const Onboarding2(),
       onboarding3: (context) => const Onboarding3(),
       onboarding4: (context) => const Onboarding4(),
+      settings: (context) => const SettingsScreen(),
     };
   }
 }

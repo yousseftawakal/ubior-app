@@ -46,43 +46,6 @@ class _SearchScreenState extends State<SearchScreen> {
     'wardrobeItems': <WardrobeItem>[],
   };
 
-  /// Handles bottom navigation bar tab selection
-  void _onNavTap(int index) {
-    // Avoid unnecessary navigation if already on the selected tab
-    if (index == _currentNavIndex) return;
-
-    switch (index) {
-      case 0:
-        // Navigate to Feed Screen (index 0)
-        Navigator.pushReplacementNamed(context, AppRoutes.home);
-        break;
-      case 1:
-        // Already on Search Screen (index 1)
-        return;
-      case 2:
-        // Handle create post - modal or navigate to create screen
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Create post feature coming soon')),
-        );
-        break;
-      case 3:
-        // Handle create post - modal or navigate to create screen
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Create post feature coming soon')),
-        );
-      case 4:
-        // Navigate to Profile screen
-        Navigator.pushReplacementNamed(context, AppRoutes.profile);
-        break;
-      default:
-        // Other screens not implemented yet, show a message
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Navigation to tab $index not implemented yet'),
-          ),
-        );
-    }
-  }
 
   /// Removes a search term from recent searches list
   void _removeSearch(int index) {
@@ -186,7 +149,24 @@ class _SearchScreenState extends State<SearchScreen> {
       // Bottom navigation bar for app-wide navigation
       bottomNavigationBar: BottomNavBar(
         currentIndex: _currentNavIndex,
-        onTap: _onNavTap,
+        onTap: (index) {
+          if (index == _currentNavIndex) return;
+
+          switch (index) {
+            case 0:
+              Navigator.pushReplacementNamed(context, AppRoutes.home);
+              break;
+            case 2:
+              Navigator.pushReplacementNamed(context, AppRoutes.createPost);
+              break;
+            case 3:
+              Navigator.pushReplacementNamed(context, AppRoutes.studio);
+              break;
+            case 4:
+              Navigator.pushReplacementNamed(context, AppRoutes.profile);
+              break;
+          }
+        },
       ),
     );
   }

@@ -8,6 +8,7 @@ class User {
   final int postsCount;
   final int followersCount;
   final int followingCount;
+  final String? email;
 
   User({
     required this.id,
@@ -19,6 +20,7 @@ class User {
     this.postsCount = 0,
     this.followersCount = 0,
     this.followingCount = 0,
+    this.email,
   });
 
   // Create a User from JSON data
@@ -33,6 +35,7 @@ class User {
       postsCount: json['posts_count'] ?? 0,
       followersCount: json['followers_count'] ?? 0,
       followingCount: json['following_count'] ?? 0,
+      email: json['email'],
     );
   }
 
@@ -48,6 +51,7 @@ class User {
       'posts_count': postsCount,
       'followers_count': followersCount,
       'following_count': followingCount,
+      'email': email,
     };
   }
 }
