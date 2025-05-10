@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../config/theme.dart';
 import '../../config/routes.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 /// Bottom navigation bar component used throughout the app
 /// Provides consistent navigation between main app sections:
@@ -108,14 +107,9 @@ class BottomNavBar extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        if (index == 2) {
-          // Special case for add button - doesn't navigate, just triggers callback
-          onTap(index);
-        } else if (route.isNotEmpty) {
-          // Navigate to the specified route and update the selected index
-          Navigator.of(context).pushReplacementNamed(route);
-          onTap(index);
-        }
+        // Navigate to the specified route and update the selected index
+        Navigator.of(context).pushReplacementNamed(route);
+        onTap(index);
       },
       child: Container(
         padding: const EdgeInsets.all(8),
@@ -136,7 +130,6 @@ class BottomNavBar extends StatelessWidget {
   Widget _buildCenterButton(BuildContext context) {
     return InkWell(
       onTap: () {
-        // Special case for add button - doesn't navigate, just triggers callback
         onTap(2);
       },
       child: Container(

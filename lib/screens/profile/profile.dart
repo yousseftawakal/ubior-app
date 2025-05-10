@@ -33,34 +33,36 @@ class _ProfileState extends State<Profile> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: 90,
         backgroundColor: AppTheme.backgroundColor,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: AppTheme.textPrimaryColor),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        titleSpacing: 18,
         title: Text(
           'Profile',
           style: TextStyle(
+            fontSize: 20,
             color: AppTheme.textPrimaryColor,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.bold,
           ),
         ),
         actions: [
-          IconButton(
-            icon: Icon(
-              Icons.settings_outlined,
-              color: AppTheme.textPrimaryColor,
+          Padding(
+            padding: const EdgeInsets.only(right: 18),
+            child: IconButton(
+              icon: Icon(
+                Icons.settings_outlined,
+                color: AppTheme.textPrimaryColor,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
+                );
+              },
             ),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
-            },
           ),
         ],
         scrolledUnderElevation: 0,
